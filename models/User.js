@@ -12,7 +12,10 @@ class User {
         this._admin = admin;
         this._register = new Date();
     }
+    get register(){
 
+     return this._register; 
+    }
     get name(){
         return this._name;
 
@@ -46,10 +49,7 @@ class User {
 
     }
 
-    get register(){
-
-        return this._register; 
-    }
+   
 
     set photo(value){
 

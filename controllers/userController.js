@@ -1,6 +1,6 @@
 class UserController {
 
-    constructor(formId , tableId) {
+    constructor(formId, tableId) {
 
         this.formEl = document.getElementById(formId);
         this.tableEl = document.getElementById(tableId);
@@ -12,17 +12,19 @@ class UserController {
     onSubmit() {
 
 
-       this.formEl.addEventListener("submit",e => {
+        this.formEl.addEventListener("submit", event => {
 
-            e.preventDefault();
+            event.preventDefault();
 
             let btn = this.formEl.querySelector("[type=submit]");
-            
+
             btn.disabled = true;
 
             let values = this.getValues();
 
-        this.getPhoto().then((content)=>{
+            if (!values) return false;
+
+            this.getPhoto().then((content) => {
 
                 values.photo = content;
 
@@ -31,57 +33,56 @@ class UserController {
                 this.formEl.reset();
 
                 btn.disabled = false;
-            
-            },(e)=>{
 
-            console.error(e);
-                
+            }, (e) => {
+
+                console.error(e);
+
             });
 
         });
 
     }
 
-    getPhoto(){
+    getPhoto() {
 
-        return new Promise ((resolve, reject)=>{
+        return new Promise((resolve, reject) => {
 
-        let fileReader = new FileReader();
+            let fileReader = new FileReader();
 
-        let elements = [...this.formEl.elements].filter(item=>{
+            let elements = [...this.formEl.elements].filter(item => {
 
-        if (item.name === 'photo')
-        {
+                if (item.name === 'photo') {
 
-            return item;
-        }
+                    return item;
+                }
 
-        });
+            });
 
-        let file = (elements[0].files[0]);
+            let file = (elements[0].files[0]);
 
-        fileReader.onload = () => {
-
-        
-        resolve(fileReader.result);
-
-        };
-
-        fileReader.onerror = (e)=>{
-
-            reject(e);
-        };
+            fileReader.onload = () => {
 
 
+                resolve(fileReader.result);
 
-        if (file){ 
-        fileReader.readAsDataURL(file);
-        }
+            };
 
-        else{
+            fileReader.onerror = (e) => {
 
-            resolve('/home/gustavonascimento/Downloads/user.png'); 
-        }
+                reject(e);
+            };
+
+
+
+            if (file) {
+                fileReader.readAsDataURL(file);
+            }
+
+            else {
+
+                resolve('/home/gustavonascimento/Downloads/user.png');
+            }
         });
 
     }
@@ -91,25 +92,23 @@ class UserController {
         let user = {};
         let isValid = true;
 
-    [...this.formEl.elements].forEach(function (field, index) {
+        [...this.formEl.elements].forEach(function (field, index) {
 
-        if (['name','email','password'].indexOf(field.name) > -1 && !field.value)
-        {
-        
-        field.parentElement.classList.add('has-error');
-        isValid = false;
-            
-        }
+            if (['name', 'email', 'password'].indexOf(field.name) > -1 && !field.value) {
+
+                field.parentElement.classList.add('has-error');
+                isValid = false;
+
+            }
 
             if (field.name == 'gender') {
 
                 user[field.name] = field.value;
             }
 
-            else if (field.name === 'admin') 
-            {
+            else if (field.name === 'admin') {
 
-        user[field.name] = field.checked;
+                user[field.name] = field.checked;
 
             }
             else {
@@ -120,9 +119,9 @@ class UserController {
 
         });
 
-        if(!isValid){
+        if (!isValid) {
 
-        return false;
+            return false;
 
         }
 
@@ -139,15 +138,17 @@ class UserController {
 
     }
 
-     addLine(dataUser) {
+    addLine(dataUser) {
 
         let tr = document.createElement('tr');
 
-        tr.innerHTML  = `
+        tr.dataset.user = JSON.stringify(dataUser);
+
+        tr.innerHTML = `
                 <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
                 <td>${dataUser.name}</td>
                 <td>${dataUser.email}</td>
-                <td>${(dataUser.admin) ? "Sim": "Não"}</td>
+                <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
                 <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
@@ -155,7 +156,32 @@ class UserController {
                 </td>
             `;
 
-            this.tableEl.appendChild(tr);
-        }
+        this.tableEl.appendChild(tr);
+
+        this.updateCount()
+    }
+
+    updateCount(){
+
+        let numberUsers = 0;
+        let numberAdmin = 0;
+
+        [...this.tableEl.children].forEach(tr => {
+
+            numberUsers++;
+            let user = JSON.parse(tr.dataset.user);
+
+            if (user._admin) {
+                numberAdmin++;
+            } 
+
+        });
+
+
+        document.querySelector("#number-users").innerHTML = numberUsers;
+        document.querySelector("#number-users-admin").innerHTML = numberAdmin;
+
+
+    }
 
 }

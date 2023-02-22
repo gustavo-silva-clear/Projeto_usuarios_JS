@@ -18,24 +18,26 @@ class UserController {
 
             let values = this.getValues();
 
+        this.getPhoto().then((content)=>{
+
+                values.photo = content;
+
+                this.addLine(values);
             
+            },(e)=>{
 
-            this.getPhoto((content)=>{
-
-
-            values.photo = content;
-
-            this.addLine(values);
-
+            console.error(e);
+                
             });
-
-           
 
         });
 
     }
 
-    getPhoto(callback){
+    getPhoto(){
+
+        return new Promise ((resolve, reject)=>{
+
         let fileReader = new FileReader();
 
         let elements = [...this.formEl.elements].filter(item=>{
@@ -53,10 +55,18 @@ class UserController {
         fileReader.onload = () => {
 
         
-        callback(fileReader.result);
+        resolve(fileReader.result);
 
         };
+
+        fileReader.onerror = (e)=>{
+
+            reject(e);
+        };
+
         fileReader.readAsDataURL(file);
+
+        });
 
     }
 

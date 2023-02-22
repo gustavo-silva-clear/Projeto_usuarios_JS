@@ -8,7 +8,17 @@ class UserController {
         this.tableEl = document.getElementById(tableId);
 
         this.onSubmit();
+        this.onEdit();
 
+    }
+
+    onEdit() {
+
+        document.querySelector("#box-user-update .btn-cancel").addEventListener("click", e => {
+
+        this.showCreate(); 
+
+        });
     }
 
     onSubmit() {
@@ -153,17 +163,38 @@ class UserController {
                 <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
                 <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
-                    <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+                    <button type="button" class="btn btn-primary btn-xs btn-edit btn-flat">Editar</button>
                     <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
                 </td>
             `;
+
+        tr.querySelector(".btn-edit").addEventListener("click", e => {
+
+            console.log(JSON.parse(tr.dataset.user));
+            this.showEdit();
+
+        });
 
         this.tableEl.appendChild(tr);
 
         this.updateCount()
     }
 
-    updateCount(){
+    showCreate() {
+
+    document.querySelector("#box-user-create").style.display = "block";
+    document.querySelector("#box-user-update").style.display = "none";
+
+    }
+
+    showEdit() {
+
+    document.querySelector("#box-user-create").style.display = "none";
+    document.querySelector("#box-user-update").style.display = "block";
+        
+    }
+
+    updateCount() {
 
         let numberUsers = 0;
         let numberAdmin = 0;
@@ -175,7 +206,7 @@ class UserController {
 
             if (user._admin) {
                 numberAdmin++;
-            } 
+            }
 
         });
 

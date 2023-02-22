@@ -1,3 +1,5 @@
+//Classe de controle de usuario
+
 class UserController {
 
     constructor(formId, tableId) {

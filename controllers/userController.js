@@ -52,21 +52,11 @@ class UserController {
 
                 }
 
-                tr.dataset.user = JSON.stringify(result);
+                let user = new User();
 
-                tr.innerHTML = `
-                    <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
-                    <td>${result._name}</td>
-                    <td>${result._email}</td>
-                    <td>${(result._admin) ? "Sim" : "Não"}</td>
-                    <td>${Utils.dateFormat(result._register)}</td>
-                    <td>
-                        <button type="button" class="btn btn-primary btn-xs btn-edit btn-flat">Editar</button>
-                        <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-                    </td>
-                `;
+                user.loadFromJSON(result)
 
-                this.addEventsTr(tr);
+                this.getTr(user, tr)           
 
                 this.updateCount();
 
@@ -181,7 +171,11 @@ class UserController {
 
             if (field.name === 'gender') {
 
-                user[field.name] = field.value;
+                if(field.checked){
+
+                    user[field.name] = field.value;
+
+                }
             }
 
             else if (field.name == 'admin') {
@@ -253,13 +247,22 @@ class UserController {
         users.push(data);
 
         localStorage.setItem("users", JSON.stringify(users));
-        
+
 
     }
 
     addLine(dataUser) {
 
-        let tr = document.createElement('tr');
+        let tr = this.getTr(dataUser)
+
+        this.tableEl.appendChild(tr);
+
+        this.updateCount()
+    }
+
+    getTr(dataUser , tr = null) {
+
+        if(tr === null) tr = document.createElement('tr');
 
         tr.dataset.user = JSON.stringify(dataUser);
 
@@ -270,25 +273,24 @@ class UserController {
                 <td>${(dataUser.admin) ? "Sim" : "Não"}</td>
                 <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
-                    <button type="button" class="btn btn-edit btn-primary btn-xs  btn-flat">Editar</button>
+                    <button type="button" class="btn  btn-primary btn-edit btn-xs  btn-flat">Editar</button>
                     <button type="button" class="btn btn-delete  btn-danger btn-xs btn-flat">Excluir</button>
                 </td>
             `;
-
         this.addEventsTr(tr);
 
-        this.tableEl.appendChild(tr);
+        return tr;
 
-        this.updateCount()
     }
 
     addEventsTr(tr) {
 
-        tr.querySelector(".btn-delete").addEventListener("click", e => {
+       tr.querySelector(".btn-delete").addEventListener("click", (e) => {
 
-            if (confirm("Deseja realmente excluir?")) {
+            if(confirm("Deseja relamente excluir?")) {
 
                 tr.remove();
+
                 this.updateCount();
 
             }
@@ -309,7 +311,7 @@ class UserController {
                     switch (field.type) {
                         case 'file':
                             continue;
-                        //  break;
+                            break;
 
                         case 'radio':
                             field = this.formUpdateEl.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
@@ -324,6 +326,7 @@ class UserController {
                             field.value = json[name];
 
                     }
+
                 }
 
             }
@@ -362,9 +365,7 @@ class UserController {
             numberUsers++;
             let user = JSON.parse(tr.dataset.user);
 
-            if (user._admin) {
-                numberAdmin++;
-            }
+            if (user._admin) numberAdmin++;
 
         });
 

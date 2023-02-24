@@ -89,12 +89,14 @@ class User {
 
         }
 
-        return users
+        return users;
     }
 
     getNewId() {
 
-        if (!window.id) window.id = 0;
+        if (!window.id) {
+            window.id = 0;
+        }
 
         id++;
 
@@ -108,21 +110,24 @@ class User {
 
         if (this.id > 0) {
 
-            let user = users.filter(u => { return u._id === this.id; })
+            users.map(u => {
 
-            let newUser = Object.assign({}, user , this)
+                if (u._id ==+ this.id) {
+
+                    u = this;
+                }
+                return u;
+            });
         }
 
         else {
 
-            this._id = this.getNewId()
-            users.push(data);
-
-            localStorage.setItem("users", JSON.stringify(users));
+            this._id = this.getNewId();
+            users.push(this);
 
         }
 
-
+         localStorage.setItem("users", JSON.stringify(users));
 
     }
 }
